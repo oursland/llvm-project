@@ -16,8 +16,12 @@ add_public_tablegen_target(SHCommonTableGen)
 
 add_llvm_target(SHCodeGen
   SHAsmPrinter.cpp
+  SHBranchExpansion.cpp
   SHConstantIslandPass.cpp
   SHConstantPoolValue.cpp
+  SHDelaySlotFiller.cpp
+  SHDTCombine.cpp
+  SHFPSCRPass.cpp
   SHFrameLowering.cpp
   SHInstrInfo.cpp
   SHISelDAGToDAG.cpp

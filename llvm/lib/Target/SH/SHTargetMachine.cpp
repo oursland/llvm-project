@@ -140,8 +140,16 @@ bool SHPassConfig::addInstSelector() {
 }
 
 void SHPassConfig::addPreEmitPass() {
-  // Machine passes (DT combine, FPSCR, delay slot filler, branch expansion)
-  // are registered in a later patch.
+  // 0. Combine ADD #-1 + compare-to-zero into DT Rn.
+  addPass(createSHDTCombinePass());
+  // 1. Toggle FPSCR PR bit for single/double precision mixed arithmetic.
+  addPass(createSHFPSCRPass());
+  // 2. Fill delay slots — creates bundles.  Instruction layout is
+  //    mostly final after this; sizes are accurate.
+  addPass(createSHDelaySlotFillerPass());
+  // 3. Expand far branches — BT/BF/BRA out of range are expanded to
+  //    inverted + BRA or BR_FAR.  Sizes are stable after this.
+  addPass(createSHBranchExpansionPass());
 }
 
 void SHPassConfig::addPreEmitPass2() {
