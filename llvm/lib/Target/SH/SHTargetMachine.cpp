@@ -145,5 +145,8 @@ void SHPassConfig::addPreEmitPass() {
 }
 
 void SHPassConfig::addPreEmitPass2() {
-  // Constant island pass is registered in a later patch.
+  // Inserts Constant Islands.  Block sizes cannot be increased after this
+  // point, as this may push the branch ranges and load offsets of accessing
+  // constant pools out of range.
+  addPass(createSHConstantIslandPass());
 }
