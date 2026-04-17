@@ -92,6 +92,12 @@ public:
     return false;
   }
 
+  /// If true, the addend is embedded in the instruction data (like REL)
+  /// even though RELA format is used.  The RELA addend field is set to 0.
+  /// This is needed for targets like SH4 where GNU ld reads the addend
+  /// from instruction data rather than the RELA field.
+  virtual bool addendInData() const { return false; }
+
   virtual void sortRelocs(std::vector<ELFRelocationEntry> &Relocs);
 
   /// \name Accessors

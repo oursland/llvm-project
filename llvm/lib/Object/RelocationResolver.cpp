@@ -642,6 +642,28 @@ static uint64_t resolveCOFFX86_64(uint64_t Type, uint64_t Offset, uint64_t S,
   }
 }
 
+static bool supportsSH(uint64_t Type) {
+  switch (Type) {
+  case ELF::R_SH_DIR32:
+  case ELF::R_SH_REL32:
+    return true;
+  default:
+    return false;
+  }
+}
+
+static uint64_t resolveSH(uint64_t Type, uint64_t Offset, uint64_t S,
+                          uint64_t LocData, int64_t Addend) {
+  switch (Type) {
+  case ELF::R_SH_DIR32:
+    return (S + Addend) & 0xFFFFFFFF;
+  case ELF::R_SH_REL32:
+    return (S + Addend - Offset) & 0xFFFFFFFF;
+  default:
+    llvm_unreachable("Invalid relocation type");
+  }
+}
+
 static bool supportsCOFFARM(uint64_t Type) {
   switch (Type) {
   case COFF::IMAGE_REL_ARM_SECREL:
@@ -856,6 +878,14 @@ getRelocationResolver(const ObjectFile &Obj) {
     case Triple::riscv32:
     case Triple::riscv32be:
       return {supportsRISCV, resolveRISCV};
+    case Triple::sh:
+    case Triple::sh2:
+    case Triple::sh2a:
+    case Triple::sh3:
+    case Triple::sh3e:
+    case Triple::sh4:
+    case Triple::sh4a:
+      return {supportsSH, resolveSH};
     case Triple::csky:
       return {supportsCSKY, resolveCSKY};
     default:

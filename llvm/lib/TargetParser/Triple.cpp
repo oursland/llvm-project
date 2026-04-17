@@ -106,6 +106,20 @@ StringRef Triple::getArchTypeName(ArchType Kind) {
     return "riscv32be";
   case riscv64be:
     return "riscv64be";
+  case sh:
+    return "sh";
+  case sh2:
+    return "sh2";
+  case sh2a:
+    return "sh2a";
+  case sh3:
+    return "sh3";
+  case sh3e:
+    return "sh3e";
+  case sh4:
+    return "sh4";
+  case sh4a:
+    return "sh4a";
   case shave:
     return "shave";
   case sparc:
@@ -336,6 +350,14 @@ StringRef Triple::getArchTypePrefix(ArchType Kind) {
   case riscv32be:
   case riscv64be:
     return "riscv";
+  case sh:
+  case sh2:
+  case sh2a:
+  case sh3:
+  case sh3e:
+  case sh4:
+  case sh4a:
+    return "sh";
 
   case ve:
     return "ve";
@@ -718,6 +740,14 @@ Triple::ArchType Triple::getArchTypeForLLVMName(StringRef Name) {
       .Case("wasm64", wasm64)
       .Case("renderscript32", renderscript32)
       .Case("renderscript64", renderscript64)
+      .Case("sh", sh)
+      .Case("sh2", sh2)
+      .Case("sh2a", sh2a)
+      .Case("sh3", sh3)
+      .Case("sh3e", sh3e)
+      .Case("sh4", sh4)
+      .Case("sh4a", sh4a)
+
       .Case("ve", ve)
       .Case("csky", csky)
       .Case("loongarch32", loongarch32)
@@ -865,6 +895,13 @@ Triple::ArchType Triple::parseArch(StringRef ArchName) {
           .Case("lanai", Triple::lanai)
           .Case("renderscript32", Triple::renderscript32)
           .Case("renderscript64", Triple::renderscript64)
+          .Case("sh", Triple::sh)
+          .Case("sh2", Triple::sh2)
+          .Case("sh2a", Triple::sh2a)
+          .Case("sh3", Triple::sh3)
+          .Case("sh3e", Triple::sh3e)
+          .Case("sh4", Triple::sh4)
+          .Case("sh4a", Triple::sh4a)
           .Case("shave", Triple::shave)
           .Case("ve", Triple::ve)
           .Case("wasm32", Triple::wasm32)
@@ -1226,6 +1263,13 @@ static Triple::ObjectFormatType getDefaultFormat(const Triple &T) {
   case Triple::riscv64:
   case Triple::riscv32be:
   case Triple::riscv64be:
+  case Triple::sh:
+  case Triple::sh2:
+  case Triple::sh2a:
+  case Triple::sh3:
+  case Triple::sh3e:
+  case Triple::sh4:
+  case Triple::sh4a:
   case Triple::shave:
   case Triple::sparc:
   case Triple::sparcel:
@@ -1963,6 +2007,7 @@ unsigned Triple::getArchPointerBitWidth(llvm::Triple::ArchType Arch) {
   case llvm::Triple::renderscript32:
   case llvm::Triple::riscv32:
   case llvm::Triple::riscv32be:
+  case llvm::Triple::sh4:
   case llvm::Triple::shave:
   case llvm::Triple::sparc:
   case llvm::Triple::sparcel:
@@ -2074,6 +2119,13 @@ Triple Triple::get32BitArchVariant() const {
   case Triple::renderscript32:
   case Triple::riscv32:
   case Triple::riscv32be:
+  case Triple::sh:
+  case Triple::sh2:
+  case Triple::sh2a:
+  case Triple::sh3:
+  case Triple::sh3e:
+  case Triple::sh4:
+  case Triple::sh4a:
   case Triple::shave:
   case Triple::sparc:
   case Triple::sparcel:
@@ -2166,6 +2218,13 @@ Triple Triple::get64BitArchVariant() const {
   case Triple::m68k:
   case Triple::msp430:
   case Triple::r600:
+  case Triple::sh:
+  case Triple::sh2:
+  case Triple::sh2a:
+  case Triple::sh3:
+  case Triple::sh3e:
+  case Triple::sh4:
+  case Triple::sh4a:
   case Triple::shave:
   case Triple::sparcel:
   case Triple::tce:
@@ -2296,6 +2355,13 @@ Triple Triple::getBigEndianArchVariant() const {
   case Triple::r600:
   case Triple::renderscript32:
   case Triple::renderscript64:
+  case Triple::sh:
+  case Triple::sh2:
+  case Triple::sh2a:
+  case Triple::sh3:
+  case Triple::sh3e:
+  case Triple::sh4:
+  case Triple::sh4a:
   case Triple::shave:
   case Triple::spir64:
   case Triple::spir:
@@ -2440,6 +2506,13 @@ bool Triple::isLittleEndian() const {
   case Triple::renderscript64:
   case Triple::riscv32:
   case Triple::riscv64:
+  case Triple::sh:
+  case Triple::sh2:
+  case Triple::sh2a:
+  case Triple::sh3:
+  case Triple::sh3e:
+  case Triple::sh4:
+  case Triple::sh4a:
   case Triple::shave:
   case Triple::sparcel:
   case Triple::spir64:
@@ -2687,6 +2760,13 @@ ExceptionHandling Triple::getDefaultExceptionHandling() const {
   case Triple::lanai:
   case Triple::m68k:
   case Triple::msp430:
+  case Triple::sh:
+  case Triple::sh2:
+  case Triple::sh2a:
+  case Triple::sh3:
+  case Triple::sh3e:
+  case Triple::sh4:
+  case Triple::sh4a:
   case Triple::systemz:
   case Triple::xcore:
   case Triple::xtensa:

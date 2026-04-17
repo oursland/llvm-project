@@ -1058,6 +1058,11 @@ enum {
 #include "ELFRelocs/CSKY.def"
 };
 
+// ELF Relocation types for SH
+enum {
+#include "ELFRelocs/SH.def"
+};
+
 // LoongArch Specific e_flags
 enum : unsigned {
   // Definitions from LoongArch ELF psABI v2.01.

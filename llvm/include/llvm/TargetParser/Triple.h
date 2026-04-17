@@ -113,6 +113,13 @@ public:
     wasm64,         // WebAssembly with 64-bit pointers
     renderscript32, // 32-bit RenderScript
     renderscript64, // 64-bit RenderScript
+    sh,             // SuperH SH
+    sh2,            // SuperH SH2
+    sh2a,           // SuperH SH2A
+    sh3,            // SuperH SH3
+    sh3e,           // SuperH SH3E
+    sh4,            // SuperH SH4
+    sh4a,           // SuperH SH4A
     ve,             // NEC SX-Aurora Vector Engine
     LastArchType = ve
   };
@@ -1093,6 +1100,15 @@ public:
 
   /// Tests whether the target is SPARC.
   bool isSPARC() const { return isSPARC32() || isSPARC64(); }
+
+  /// Tests whether the target is SuperH (any variant: sh, sh2, sh2a, sh3,
+  /// sh3e, sh4, sh4a).
+  bool isSH() const {
+    return getArch() == Triple::sh || getArch() == Triple::sh2 ||
+           getArch() == Triple::sh2a || getArch() == Triple::sh3 ||
+           getArch() == Triple::sh3e || getArch() == Triple::sh4 ||
+           getArch() == Triple::sh4a;
+  }
 
   /// Tests whether the target is SystemZ.
   bool isSystemZ() const { return getArch() == Triple::systemz; }

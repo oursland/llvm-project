@@ -307,6 +307,11 @@ craig.topper@sifive.com (email), [topperc](https://github.com/topperc) (GitHub) 
 Philip Reames \
 listmail@philipreames.com (email), [preames](https://github.com/preames) (GitHub)
 
+#### SH Backend
+
+Jackson Oursland \
+jacob.oursland@gmail.com, [oursland](https://github.com/oursland) (GitHub)
+
 #### Sparc backend
 
 Koakuma \

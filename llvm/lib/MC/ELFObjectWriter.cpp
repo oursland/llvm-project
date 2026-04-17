@@ -1377,8 +1377,15 @@ void ELFObjectWriter::recordRelocation(const MCFragment &F,
   if (SymA)
     SymA->setUsedInReloc();
 
-  FixedValue = usesRela(TO, Section) ? 0 : Addend;
-  Relocations[&Section].emplace_back(FixupOffset, SymA, Type, Addend);
+  if (TargetObjectWriter->addendInData()) {
+    // Target wants addend in instruction data even though RELA is used.
+    // RELA addend field is set to 0.
+    FixedValue = Addend;
+    Relocations[&Section].emplace_back(FixupOffset, SymA, Type, 0);
+  } else {
+    FixedValue = usesRela(TO, Section) ? 0 : Addend;
+    Relocations[&Section].emplace_back(FixupOffset, SymA, Type, Addend);
+  }
 }
 
 bool ELFObjectWriter::usesRela(const MCTargetOptions *TO,
