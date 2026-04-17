@@ -214,6 +214,7 @@ void setMipsTargetInfo(Ctx &);
 void setPPC64TargetInfo(Ctx &);
 void setPPCTargetInfo(Ctx &);
 void setRISCVTargetInfo(Ctx &);
+void setSHTargetInfo(Ctx &);
 void setSPARCV9TargetInfo(Ctx &);
 void setSystemZTargetInfo(Ctx &);
 void setX86TargetInfo(Ctx &);

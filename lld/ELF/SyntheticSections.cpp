@@ -467,7 +467,19 @@ bool EhFrameHeader::updateAllocSize(Ctx &ctx) {
       auto *isec = cast<EhInputSection>(fde->sec);
       auto &reloc = isec->rels[fde->firstRelocation];
       assert(isa<Defined>(reloc.sym) && "isFdeLive should have checked this");
-      int64_t pcRel = reloc.sym->getVA(ctx) + reloc.addend - hdrVA;
+      // For the FDE initial_location, include any in-section addend stored in
+      // the FDE data itself. Some targets (e.g. SH) use RELA relocations with
+      // addend=0 but embed the function offset in the section data. The
+      // relocate() handler adds the computed value to the existing data, so we
+      // must account for the in-data offset to distinguish FDEs pointing to
+      // different functions within the same section.
+      int64_t inDataAddend = 0;
+      if (reloc.offset >= fde->inputOff) {
+        const uint8_t *loc = isec->content().data() + reloc.offset;
+        inDataAddend = ctx.target->getImplicitAddend(loc, reloc.type);
+      }
+      int64_t pcRel =
+          reloc.sym->getVA(ctx) + reloc.addend + inDataAddend - hdrVA;
       int64_t fdeVARel = ehFrame->getParent()->addr + fde->outputOff - hdrVA;
       fdes.push_back({pcRel, fdeVARel});
       newLarge |= !isInt<32>(pcRel) || !isInt<32>(fdeVARel);

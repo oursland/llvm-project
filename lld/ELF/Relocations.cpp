@@ -769,6 +769,13 @@ void elf::addGotEntry(Ctx &ctx, Symbol &sym) {
     return;
   }
 
+  // For TLS symbols accessed via IE (Initial Exec), the GOT entry should
+  // contain the TP-relative offset rather than the symbol's VA.
+  if (sym.isTls() && !ctx.arg.isPic) {
+    ctx.in.got->addConstant({R_TPREL, ctx.target->symbolicRel, off, 0, &sym});
+    return;
+  }
+
   // Otherwise, the value is either a link-time constant or the load base
   // plus a constant.
   if (!ctx.arg.isPic || isAbsolute(sym))

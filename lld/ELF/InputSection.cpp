@@ -769,6 +769,7 @@ static int64_t getTlsTpOffset(Ctx &ctx, const Symbol &s) {
     // Variant 1.
   case EM_ARM:
   case EM_AARCH64:
+  case EM_SH:
     return s.getVA(ctx, 0) + ctx.arg.wordsize * 2 +
            ((tls->p_vaddr - ctx.arg.wordsize * 2) & (tls->p_align - 1));
   case EM_MIPS:
@@ -1451,6 +1452,14 @@ void EhInputSection::preprocessRelocs(Relocs<RelTy> elfRels) {
         RelTy::HasAddend
             ? getAddend<ELFT>(rel)
             : ctx.target->getImplicitAddend(content().data() + offset, type);
+    // SH uses RELA with addendInData: the assembler stores the real addend in
+    // section data and sets r_addend=0. For .eh_frame relocations (LSDA
+    // pointers, personality pointers), the in-data addend gives the offset
+    // within the target section. Without this, all LSDA pointers resolve to the
+    // section base, breaking exception handling for multi-function translation
+    // units. This matches the correction in RelocScan::getAddend.
+    if (RelTy::HasAddend && ctx.arg.emachine == EM_SH && type == R_SH_DIR32)
+      addend += ctx.target->getImplicitAddend(content().data() + offset, type);
     rels.push_back({expr, type, offset, addend, &sym});
   }
 }

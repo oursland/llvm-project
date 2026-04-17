@@ -176,9 +176,18 @@ public:
 
 template <class ELFT, class RelTy>
 int64_t RelocScan::getAddend(const RelTy &r, RelType type) {
-  return RelTy::HasAddend ? elf::getAddend<ELFT>(r)
-                          : ctx.target->getImplicitAddend(
-                                sec->content().data() + r.r_offset, type);
+  if constexpr (!RelTy::HasAddend)
+    return ctx.target->getImplicitAddend(sec->content().data() + r.r_offset,
+                                         type);
+  int64_t addend = elf::getAddend<ELFT>(r);
+  // SH uses RELA but GCC stores part of the addend in section data for
+  // R_SH_DIR32 relocations (e.g., .tdata initializer offsets, .data.rel.ro
+  // function pointers). GNU ld sums both the implicit (section data) and
+  // explicit (r_addend) addends.
+  if (ctx.arg.emachine == EM_SH && type == R_SH_DIR32)
+    addend +=
+        ctx.target->getImplicitAddend(sec->content().data() + r.r_offset, type);
+  return addend;
 }
 
 template <class ELFT, class RelTy>

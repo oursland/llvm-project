@@ -164,6 +164,8 @@ static std::tuple<ELFKind, uint16_t, uint8_t> parseEmulation(Ctx &ctx,
           .Cases({"elf32btsmip", "elf32btsmipn32"}, {ELF32BEKind, EM_MIPS})
           .Cases({"elf32ltsmip", "elf32ltsmipn32"}, {ELF32LEKind, EM_MIPS})
           .Case("elf32lriscv", {ELF32LEKind, EM_RISCV})
+          .Cases({"shlelf_linux", "shlelf_linux_eabi"}, {ELF32LEKind, EM_SH})
+          .Case("elf32sh", {ELF32LEKind, EM_SH})
           .Cases({"elf32ppc", "elf32ppclinux"}, {ELF32BEKind, EM_PPC})
           .Cases({"elf32lppc", "elf32lppclinux"}, {ELF32LEKind, EM_PPC})
           .Case("elf32loongarch", {ELF32LEKind, EM_LOONGARCH})
@@ -416,6 +418,7 @@ static void checkOptions(Ctx &ctx) {
   }
 
   if (ctx.arg.emachine != EM_AARCH64 && ctx.arg.emachine != EM_ARM &&
+      ctx.arg.emachine != EM_SH &&
       ctx.arg.zExecuteOnlyReport != ReportPolicy::None)
     ErrAlways(ctx)
         << "-z execute-only-report only supported on AArch64 and ARM";
@@ -1368,9 +1371,10 @@ static SmallVector<StringRef, 0> getSymbolOrderingFile(Ctx &ctx,
 
 static bool getIsRela(Ctx &ctx, opt::InputArgList &args) {
   // The psABI specifies the default relocation entry format.
-  bool rela = is_contained({EM_AARCH64, EM_AMDGPU, EM_HEXAGON, EM_LOONGARCH,
-                            EM_PPC, EM_PPC64, EM_RISCV, EM_S390, EM_X86_64},
-                           ctx.arg.emachine);
+  bool rela =
+      is_contained({EM_AARCH64, EM_AMDGPU, EM_HEXAGON, EM_LOONGARCH, EM_PPC,
+                    EM_PPC64, EM_RISCV, EM_S390, EM_SH, EM_X86_64},
+                   ctx.arg.emachine);
   // If -z rel or -z rela is specified, use the last option.
   for (auto *arg : args.filtered(OPT_z)) {
     StringRef s(arg->getValue());
