@@ -237,6 +237,14 @@ public:
 
     eCore_wasm32,
 
+    eCore_sh,
+    eCore_sh2,
+    eCore_sh2a,
+    eCore_sh3,
+    eCore_sh3e,
+    eCore_sh4,
+    eCore_sh4a,
+
     kNumCores,
 
     kCore_invalid,
@@ -283,8 +291,10 @@ public:
     kCore_mips64el_last = eCore_mips64r6el,
 
     kCore_mips_first = eCore_mips32,
-    kCore_mips_last = eCore_mips64r6el
+    kCore_mips_last = eCore_mips64r6el,
 
+    kCore_sh_first = eCore_sh,
+    kCore_sh_last = eCore_sh4a
   };
 
   /// Default constructor.

@@ -607,6 +607,37 @@ void DynamicRegisterInfo::Finalize(const ArchSpec &arch) {
       }
       break;
 
+    case llvm::Triple::sh:
+    case llvm::Triple::sh2:
+    case llvm::Triple::sh2a:
+    case llvm::Triple::sh3:
+    case llvm::Triple::sh3e:
+    case llvm::Triple::sh4:
+    case llvm::Triple::sh4a:
+      for (auto &reg : m_regs) {
+        if (strcmp(reg.name, "pc") == 0)
+          reg.kinds[eRegisterKindGeneric] = LLDB_REGNUM_GENERIC_PC;
+        else if ((strcmp(reg.name, "sp") == 0) ||
+                 (strcmp(reg.name, "r15") == 0))
+          reg.kinds[eRegisterKindGeneric] = LLDB_REGNUM_GENERIC_SP;
+        else if ((strcmp(reg.name, "fp") == 0) ||
+                 (strcmp(reg.name, "r14") == 0))
+          reg.kinds[eRegisterKindGeneric] = LLDB_REGNUM_GENERIC_FP;
+        else if (strcmp(reg.name, "pr") == 0)
+          reg.kinds[eRegisterKindGeneric] = LLDB_REGNUM_GENERIC_RA;
+        else if (strcmp(reg.name, "sr") == 0)
+          reg.kinds[eRegisterKindGeneric] = LLDB_REGNUM_GENERIC_FLAGS;
+        else if (strcmp(reg.name, "r4") == 0)
+          reg.kinds[eRegisterKindGeneric] = LLDB_REGNUM_GENERIC_ARG1;
+        else if (strcmp(reg.name, "r5") == 0)
+          reg.kinds[eRegisterKindGeneric] = LLDB_REGNUM_GENERIC_ARG2;
+        else if (strcmp(reg.name, "r6") == 0)
+          reg.kinds[eRegisterKindGeneric] = LLDB_REGNUM_GENERIC_ARG3;
+        else if (strcmp(reg.name, "r7") == 0)
+          reg.kinds[eRegisterKindGeneric] = LLDB_REGNUM_GENERIC_ARG4;
+      }
+      break;
+
     default:
       break;
     }

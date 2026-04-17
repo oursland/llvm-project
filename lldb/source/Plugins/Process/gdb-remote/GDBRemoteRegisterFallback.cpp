@@ -75,6 +75,26 @@ static std::vector<DynamicRegisterInfo::Register> GetRegisters_x86_64() {
   return registers;
 }
 
+static std::vector<DynamicRegisterInfo::Register> GetRegisters_sh() {
+  ConstString empty_alt_name;
+  ConstString reg_set{"general purpose registers"};
+
+  std::vector<DynamicRegisterInfo::Register> registers{
+      R32(r0),    R32(r1),   R32(r2),   R32(r3),   R32(r4),   R32(r5),
+      R32(r6),    R32(r7),   R32(r8),   R32(r9),   R32(r10),  R32(r11),
+      R32(r12),   R32(r13),  R32(r14),  R32(r15),  R32(pc),   R32(pr),
+      R32(gbr),   R32(vbr),  R32(mach), R32(macl), R32(sr),   R32(fpul),
+      R32(fpscr), R32(fr0),  R32(fr1),  R32(fr2),  R32(fr3),  R32(fr4),
+      R32(fr5),   R32(fr6),  R32(fr7),  R32(fr8),  R32(fr9),  R32(fr10),
+      R32(fr11),  R32(fr12), R32(fr13), R32(fr14), R32(fr15), R32(ssr),
+      R32(spc),   R32(r0b0), R32(r1b0), R32(r2b0), R32(r3b0), R32(r4b0),
+      R32(r5b0),  R32(r6b0), R32(r7b0), R32(r0b1), R32(r1b1), R32(r2b1),
+      R32(r3b1),  R32(r4b1), R32(r5b1), R32(r6b1), R32(r7b1),
+  };
+
+  return registers;
+}
+
 #undef R32
 #undef R64
 #undef REG
@@ -90,6 +110,14 @@ GetFallbackRegisters(const ArchSpec &arch_to_use) {
     return GetRegisters_x86();
   case llvm::Triple::x86_64:
     return GetRegisters_x86_64();
+  case llvm::Triple::sh:
+  case llvm::Triple::sh2:
+  case llvm::Triple::sh2a:
+  case llvm::Triple::sh3:
+  case llvm::Triple::sh3e:
+  case llvm::Triple::sh4:
+  case llvm::Triple::sh4a:
+    return GetRegisters_sh();
   default:
     break;
   }

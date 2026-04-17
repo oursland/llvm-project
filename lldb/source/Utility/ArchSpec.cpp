@@ -248,6 +248,17 @@ static constexpr const CoreDefinition g_core_definitions[] = {
 
     {eByteOrderLittle, 4, 1, 4, llvm::Triple::wasm32, ArchSpec::eCore_wasm32,
      "wasm32"},
+
+    {eByteOrderLittle, 4, 2, 4, llvm::Triple::sh, ArchSpec::eCore_sh, "sh"},
+    {eByteOrderLittle, 4, 2, 4, llvm::Triple::sh2, ArchSpec::eCore_sh2, "sh2"},
+    {eByteOrderLittle, 4, 2, 4, llvm::Triple::sh2a, ArchSpec::eCore_sh2a,
+     "sh2a"},
+    {eByteOrderLittle, 4, 2, 4, llvm::Triple::sh3, ArchSpec::eCore_sh3, "sh3"},
+    {eByteOrderLittle, 4, 2, 4, llvm::Triple::sh3e, ArchSpec::eCore_sh3e,
+     "sh3e"},
+    {eByteOrderLittle, 4, 2, 4, llvm::Triple::sh4, ArchSpec::eCore_sh4, "sh4"},
+    {eByteOrderLittle, 4, 2, 4, llvm::Triple::sh4a, ArchSpec::eCore_sh4a,
+     "sh4a"},
 };
 
 // Ensure that we have an entry in the g_core_definitions for each core. If you
@@ -412,6 +423,7 @@ static const ArchDefinitionEntry g_elf_arch_entries[] = {
     {ArchSpec::eCore_riscv64,         llvm::ELF::EM_RISCV,      ArchSpec::eRISCVSubType_riscv64}, // riscv64
     {ArchSpec::eCore_loongarch32,     llvm::ELF::EM_LOONGARCH,  ArchSpec::eLoongArchSubType_loongarch32}, // loongarch32
     {ArchSpec::eCore_loongarch64,     llvm::ELF::EM_LOONGARCH,  ArchSpec::eLoongArchSubType_loongarch64}, // loongarch64
+    {ArchSpec::eCore_sh,              llvm::ELF::EM_SH          }, // SuperH
 };
 // clang-format on
 
@@ -723,6 +735,13 @@ bool ArchSpec::CharIsSignedByDefault() const {
   case llvm::Triple::systemz:
   case llvm::Triple::xcore:
   case llvm::Triple::arc:
+  case llvm::Triple::sh:
+  case llvm::Triple::sh2:
+  case llvm::Triple::sh2a:
+  case llvm::Triple::sh3:
+  case llvm::Triple::sh3e:
+  case llvm::Triple::sh4:
+  case llvm::Triple::sh4a:
     return false;
   }
 }
