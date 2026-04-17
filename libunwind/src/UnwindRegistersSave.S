@@ -1299,8 +1299,57 @@ DEFINE_LIBUNWIND_FUNCTION(__unw_getcontext)
   .endr
 # endif
 
-  move     $a0, $zero  // UNW_ESUCCESS
-  jr       $ra
+#elif defined(__sh__)
+
+#
+# extern int __unw_getcontext(unw_context_t* thread_state)
+#
+# On entry:
+#  thread_state pointer is in r4
+#
+DEFINE_LIBUNWIND_FUNCTION(__unw_getcontext)
+  mov.l r0, @r4      // save r0 at offset 0
+  mov   r4, r0       // r0 now holds the pointer
+  add   #4, r0
+  mov.l r1, @r0      // offset 4
+  add   #4, r0
+  mov.l r2, @r0      // offset 8
+  add   #4, r0
+  mov.l r3, @r0      // offset 12
+  add   #4, r0
+  mov.l r4, @r0      // offset 16 (original r4)
+  add   #4, r0
+  mov.l r5, @r0      // offset 20
+  add   #4, r0
+  mov.l r6, @r0      // offset 24
+  add   #4, r0
+  mov.l r7, @r0      // offset 28
+  add   #4, r0
+  mov.l r8, @r0      // offset 32
+  add   #4, r0
+  mov.l r9, @r0      // offset 36
+  add   #4, r0
+  mov.l r10, @r0     // offset 40
+  add   #4, r0
+  mov.l r11, @r0     // offset 44
+  add   #4, r0
+  mov.l r12, @r0     // offset 48
+  add   #4, r0
+  mov.l r13, @r0     // offset 52
+  add   #4, r0
+  mov.l r14, @r0     // offset 56
+  add   #4, r0
+  mov.l r15, @r0     // offset 60
+
+  // PR is at offset 68 (17 * 4) in Registers_sh::_registers
+  sts pr, r1         // grab PR into r1 (already saved)
+  add #8, r0         // r0 was at 60, add 8 -> 68
+  mov.l r1, @r0
+
+  // return UNW_ESUCCESS (0)
+  mov #0, r0
+  rts
+  nop
 
 #endif
 

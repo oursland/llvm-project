@@ -46,6 +46,7 @@ enum {
   REGISTERS_VE,
   REGISTERS_S390X,
   REGISTERS_LOONGARCH,
+  REGISTERS_SH,
 };
 
 #if defined(_LIBUNWIND_TARGET_I386)
@@ -5533,6 +5534,239 @@ inline void Registers_loongarch::setVectorRegister(int, v128) {
   _LIBUNWIND_ABORT("loongarch vector support not implemented");
 }
 #endif //_LIBUNWIND_TARGET_LOONGARCH
+
+#if defined(_LIBUNWIND_TARGET_SH)
+/// Registers_sh holds the register state of a thread in a 32-bit
+/// SH process.
+class _LIBUNWIND_HIDDEN Registers_sh {
+public:
+  Registers_sh();
+  Registers_sh(const void *registers);
+
+  typedef uint32_t reg_t;
+  typedef uint32_t link_reg_t;
+  typedef const link_reg_t &link_hardened_reg_arg_t;
+
+  bool validRegister(int num) const;
+  uint32_t getRegister(int num) const;
+  void setRegister(int num, uint32_t value);
+  bool validFloatRegister(int num) const;
+  double getFloatRegister(int num) const;
+  void setFloatRegister(int num, double value);
+  bool validVectorRegister(int num) const;
+  v128 getVectorRegister(int num) const;
+  void setVectorRegister(int num, v128 value);
+  static const char *getRegisterName(int num);
+  void jumpto();
+  static constexpr int lastDwarfRegNum() {
+    return _LIBUNWIND_HIGHEST_DWARF_REGISTER_SH;
+  }
+  static int getArch() { return REGISTERS_SH; }
+
+  uint32_t getSP() const { return _registers[15]; }
+  void setSP(uint32_t value) { _registers[15] = value; }
+  uint32_t getIP() const { return _registers[17]; }
+  void setIP(uint32_t value) { _registers[17] = value; }
+
+private:
+  uint32_t _registers[22]; // r0-r15, empty, pr, macl, mach, gbr, vbr
+  double _floats[16];      // fr0-fr15
+  uint32_t _fpul;
+  uint32_t _fpscr;
+};
+
+inline Registers_sh::Registers_sh(const void *registers) {
+  static_assert((check_fit<Registers_sh, unw_context_t>::does_fit),
+                "sh registers do not fit into unw_context_t");
+  memcpy(this, registers, sizeof(*this));
+}
+
+inline Registers_sh::Registers_sh() {
+  memset(&_registers, 0, sizeof(_registers));
+  memset(&_floats, 0, sizeof(_floats));
+  _fpul = 0;
+  _fpscr = 0;
+}
+
+inline bool Registers_sh::validRegister(int regNum) const {
+  if (regNum == UNW_REG_IP || regNum == UNW_REG_SP)
+    return true;
+  if (regNum >= UNW_SH_R0 && regNum <= UNW_SH_R15)
+    return true;
+  if (regNum == UNW_SH_PR || regNum == UNW_SH_MACL ||
+      regNum == UNW_SH_MACH || regNum == UNW_SH_GBR || regNum == UNW_SH_VBR)
+    return true;
+  return false;
+}
+
+inline uint32_t Registers_sh::getRegister(int regNum) const {
+  if (regNum >= UNW_SH_R0 && regNum <= UNW_SH_R15)
+    return _registers[regNum];
+  if (regNum == UNW_REG_SP)
+    return _registers[15];
+  if (regNum == UNW_REG_IP)
+    return _registers[17];
+
+  switch (regNum) {
+  case UNW_SH_PR:
+    return _registers[17];
+  case UNW_SH_GBR:
+    return _registers[18];
+  case UNW_SH_VBR:
+    return _registers[19];
+  case UNW_SH_MACH:
+    return _registers[20];
+  case UNW_SH_MACL:
+    return _registers[21];
+  }
+  _LIBUNWIND_ABORT("unsupported sh register");
+}
+
+inline void Registers_sh::setRegister(int regNum, uint32_t value) {
+  if (regNum >= UNW_SH_R0 && regNum <= UNW_SH_R15) {
+    _registers[regNum] = value;
+    return;
+  }
+  if (regNum == UNW_REG_SP) {
+    _registers[15] = value;
+    return;
+  }
+  if (regNum == UNW_REG_IP) {
+    _registers[17] = value;
+    return;
+  }
+
+  switch (regNum) {
+  case UNW_SH_PR:
+    _registers[17] = value;
+    return;
+  case UNW_SH_GBR:
+    _registers[18] = value;
+    return;
+  case UNW_SH_VBR:
+    _registers[19] = value;
+    return;
+  case UNW_SH_MACH:
+    _registers[20] = value;
+    return;
+  case UNW_SH_MACL:
+    _registers[21] = value;
+    return;
+  }
+  _LIBUNWIND_ABORT("unsupported sh register");
+}
+
+inline bool Registers_sh::validFloatRegister(int regNum) const {
+  if (regNum >= UNW_SH_FR0 && regNum <= UNW_SH_FR15)
+    return true;
+  return false;
+}
+
+inline double Registers_sh::getFloatRegister(int regNum) const {
+  if (regNum >= UNW_SH_FR0 && regNum <= UNW_SH_FR15)
+    return _floats[regNum - UNW_SH_FR0];
+  _LIBUNWIND_ABORT("unsupported sh4 float register");
+}
+
+inline void Registers_sh::setFloatRegister(int regNum, double value) {
+  if (regNum >= UNW_SH_FR0 && regNum <= UNW_SH_FR15) {
+    _floats[regNum - UNW_SH_FR0] = value;
+    return;
+  }
+  _LIBUNWIND_ABORT("unsupported sh4 float register");
+}
+
+inline bool Registers_sh::validVectorRegister(int) const { return false; }
+
+inline v128 Registers_sh::getVectorRegister(int) const {
+  _LIBUNWIND_ABORT("sh vector support not implemented");
+}
+
+inline void Registers_sh::setVectorRegister(int, v128) {
+  _LIBUNWIND_ABORT("sh vector support not implemented");
+}
+
+inline const char *Registers_sh::getRegisterName(int regNum) {
+  switch (regNum) {
+  case UNW_SH_R0:
+    return "r0";
+  case UNW_SH_R1:
+    return "r1";
+  case UNW_SH_R2:
+    return "r2";
+  case UNW_SH_R3:
+    return "r3";
+  case UNW_SH_R4:
+    return "r4";
+  case UNW_SH_R5:
+    return "r5";
+  case UNW_SH_R6:
+    return "r6";
+  case UNW_SH_R7:
+    return "r7";
+  case UNW_SH_R8:
+    return "r8";
+  case UNW_SH_R9:
+    return "r9";
+  case UNW_SH_R10:
+    return "r10";
+  case UNW_SH_R11:
+    return "r11";
+  case UNW_SH_R12:
+    return "r12";
+  case UNW_SH_R13:
+    return "r13";
+  case UNW_SH_R14:
+    return "r14";
+  case UNW_SH_R15:
+    return "r15";
+  case UNW_SH_PR:
+    return "pr";
+  case UNW_SH_GBR:
+    return "gbr";
+  case UNW_SH_VBR:
+    return "vbr";
+  case UNW_SH_MACH:
+    return "mach";
+  case UNW_SH_MACL:
+    return "macl";
+  case UNW_SH_FR0:
+    return "fr0";
+  case UNW_SH_FR1:
+    return "fr1";
+  case UNW_SH_FR2:
+    return "fr2";
+  case UNW_SH_FR3:
+    return "fr3";
+  case UNW_SH_FR4:
+    return "fr4";
+  case UNW_SH_FR5:
+    return "fr5";
+  case UNW_SH_FR6:
+    return "fr6";
+  case UNW_SH_FR7:
+    return "fr7";
+  case UNW_SH_FR8:
+    return "fr8";
+  case UNW_SH_FR9:
+    return "fr9";
+  case UNW_SH_FR10:
+    return "fr10";
+  case UNW_SH_FR11:
+    return "fr11";
+  case UNW_SH_FR12:
+    return "fr12";
+  case UNW_SH_FR13:
+    return "fr13";
+  case UNW_SH_FR14:
+    return "fr14";
+  case UNW_SH_FR15:
+    return "fr15";
+  default:
+    return "unknown register";
+  }
+}
+#endif // _LIBUNWIND_TARGET_SH
 
 } // namespace libunwind
 

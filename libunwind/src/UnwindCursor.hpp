@@ -1144,6 +1144,10 @@ private:
   int stepWithCompactEncoding(Registers_loongarch &) { return UNW_EINVAL; }
 #endif
 
+#if defined(_LIBUNWIND_TARGET_SH)
+  int stepWithCompactEncoding(Registers_sh &) { return UNW_EINVAL; }
+#endif
+
 #if defined(_LIBUNWIND_TARGET_SPARC)
   int stepWithCompactEncoding(Registers_sparc &) { return UNW_EINVAL; }
 #endif
@@ -1224,6 +1228,10 @@ private:
   bool compactSaysUseDwarf(Registers_loongarch &, uint32_t *) const {
     return true;
   }
+#endif
+
+#if defined(_LIBUNWIND_TARGET_SH)
+  bool compactSaysUseDwarf(Registers_sh &, uint32_t *) const { return true; }
 #endif
 
 #if defined(_LIBUNWIND_TARGET_SPARC)
@@ -1314,6 +1322,10 @@ private:
   compact_unwind_encoding_t dwarfEncoding(Registers_loongarch &) const {
     return 0;
   }
+#endif
+
+#if defined(_LIBUNWIND_TARGET_SH)
+  compact_unwind_encoding_t dwarfEncoding(Registers_sh &) const { return 0; }
 #endif
 
 #if defined(_LIBUNWIND_TARGET_SPARC)

@@ -1291,6 +1291,63 @@ DEFINE_LIBUNWIND_FUNCTION(_ZN9libunwind19Registers_loongarch6jumptoEv)
 
   jr      $ra
 
+#elif defined(__sh__)
+
+//
+// void libunwind::Registers_sh::jumpto()
+//
+// On entry:
+//  thread_state pointer is in r4
+//
+  .p2align 2
+DEFINE_LIBUNWIND_FUNCTION(_ZN9libunwind13Registers_sh6jumptoEv)
+  // Load PR (offset 68 = 17 * 4)
+  mov   r4, r0
+  add   #68, r0
+  mov.l @r0, r1
+  lds   r1, pr
+
+  // Restore R1 - R3, R5 - R15, then R0, then R4.
+  mov   r4, r0
+  add   #4, r0
+  mov.l @r0, r1
+  add   #4, r0
+  mov.l @r0, r2
+  add   #4, r0
+  mov.l @r0, r3
+
+  add   #8, r0     // skip r4 (at offset 16). r0 is now 12 + 8 = 20
+  mov.l @r0, r5
+  add   #4, r0
+  mov.l @r0, r6
+  add   #4, r0
+  mov.l @r0, r7
+  add   #4, r0
+  mov.l @r0, r8
+  add   #4, r0
+  mov.l @r0, r9
+  add   #4, r0
+  mov.l @r0, r10
+  add   #4, r0
+  mov.l @r0, r11
+  add   #4, r0
+  mov.l @r0, r12
+  add   #4, r0
+  mov.l @r0, r13
+  add   #4, r0
+  mov.l @r0, r14
+  add   #4, r0
+  mov.l @r0, r15
+
+  // Finally restore R0 and R4
+  mov.l @r4, r0
+  mov   r4, r1
+  add   #16, r1
+  mov.l @r1, r4
+
+  rts
+  nop
+
 #endif
 
 #endif /* !defined(__USING_SJLJ_EXCEPTIONS__) */
