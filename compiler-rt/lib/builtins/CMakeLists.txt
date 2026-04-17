@@ -922,6 +922,19 @@ set(ve_SOURCES
 
 set(m68k_SOURCES ${GENERIC_SOURCES})
 
+set(sh_SOURCES
+  sh/fp_mode.c
+  ${GENERIC_SOURCES}
+  ${GENERIC_TF_SOURCES}
+)
+
+set(sh2_SOURCES ${sh_SOURCES})
+set(sh2a_SOURCES ${sh_SOURCES})
+set(sh3_SOURCES ${sh_SOURCES})
+set(sh3e_SOURCES ${sh_SOURCES})
+set(sh4_SOURCES ${sh_SOURCES})
+set(sh4a_SOURCES ${sh_SOURCES})
+
 add_custom_target(builtins)
 set_target_properties(builtins PROPERTIES FOLDER "Compiler-RT/Metatargets")
 
