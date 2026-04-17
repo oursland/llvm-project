@@ -3562,6 +3562,25 @@ def WasmSystemLibrary
            __stack_chk_fail, __stack_chk_guard)>;
 
 //===----------------------------------------------------------------------===//
+// SH Runtime Libcalls
+//===----------------------------------------------------------------------===//
+
+// SH libgcc uses __sdivsi3/__udivsi3 instead of __divsi3/__udivsi3
+def sh_sdivsi3 : RuntimeLibcallImpl<SDIV_I32, "__sdivsi3">;
+def sh_udivsi3 : RuntimeLibcallImpl<UDIV_I32, "__udivsi3">;
+
+def isSH : RuntimeLibcallPredicate<"TT.isSH()">;
+
+def SHSystemLibrary
+    : SystemRuntimeLibrary<isSH,
+      (add (sub DefaultRuntimeLibcallImpls, __divsi3, __udivsi3),
+           sh_sdivsi3, sh_udivsi3,
+           exp10f, exp10, exp10l_f128,
+           __powisf2, __powidf2, __powitf2_f128,
+           DefaultStackProtector, DefaultSafeStackGlobals
+)>;
+
+//===----------------------------------------------------------------------===//
 // Legacy Default Runtime Libcalls
 //===----------------------------------------------------------------------===//
 
