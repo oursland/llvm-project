@@ -116,6 +116,7 @@ add_clang_library(clangBasic
   Targets/SPIR.cpp
   Targets/Sparc.cpp
   Targets/SystemZ.cpp
+  Targets/SH.cpp
   Targets/TCE.cpp
   Targets/VE.cpp
   Targets/WebAssembly.cpp

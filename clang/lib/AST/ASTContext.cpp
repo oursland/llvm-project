@@ -10308,6 +10308,43 @@ CreateXtensaABIBuiltinVaListDecl(const ASTContext *Context) {
   return VaListTagTypedefDecl;
 }
 
+static TypedefDecl *CreateSHBuiltinVaListDecl(const ASTContext *Context) {
+  // typedef struct __va_list_tag {
+  RecordDecl *VaListTagDecl = Context->buildImplicitRecord("__va_list_tag");
+  VaListTagDecl->startDefinition();
+
+  constexpr size_t NumFields = 5;
+  QualType FieldTypes[NumFields] = {
+      Context->getPointerType(Context->VoidTy), // __va_next_o
+      Context->getPointerType(Context->VoidTy), // __va_next_o_limit
+      Context->getPointerType(Context->VoidTy), // __va_next_fp
+      Context->getPointerType(Context->VoidTy), // __va_next_fp_limit
+      Context->getPointerType(Context->VoidTy), // __va_next_stack
+  };
+  const char *FieldNames[NumFields] = {"__va_next_o", "__va_next_o_limit",
+                                       "__va_next_fp", "__va_next_fp_limit",
+                                       "__va_next_stack"};
+
+  for (unsigned i = 0; i < NumFields; ++i) {
+    FieldDecl *Field = FieldDecl::Create(
+        *Context, VaListTagDecl, SourceLocation(), SourceLocation(),
+        &Context->Idents.get(FieldNames[i]), FieldTypes[i], /*TInfo=*/nullptr,
+        /*BitWidth=*/nullptr, /*Mutable=*/false, ICIS_NoInit);
+    Field->setAccess(AS_public);
+    VaListTagDecl->addDecl(Field);
+  }
+  VaListTagDecl->completeDefinition();
+  Context->VaListTagDecl = VaListTagDecl;
+  CanQualType VaListTagType = Context->getCanonicalTagType(VaListTagDecl);
+
+  // } __builtin_va_list;
+  // GCC SH ABI: va_list is passed by value (as a 20-byte struct) on the
+  // stack, NOT as a pointer.  Using the struct directly (instead of wrapping
+  // in an array[1]) ensures that C function parameters of type va_list are
+  // classified as aggregates and passed by value, matching GCC's behavior.
+  return Context->buildImplicitTypedef(VaListTagType, "__builtin_va_list");
+}
+
 static TypedefDecl *CreateVaListDecl(const ASTContext *Context,
                                      TargetInfo::BuiltinVaListKind Kind) {
   switch (Kind) {
@@ -10329,6 +10366,8 @@ static TypedefDecl *CreateVaListDecl(const ASTContext *Context,
     return CreateHexagonBuiltinVaListDecl(Context);
   case TargetInfo::XtensaABIBuiltinVaList:
     return CreateXtensaABIBuiltinVaListDecl(Context);
+  case TargetInfo::SHBuiltinVaList:
+    return CreateSHBuiltinVaListDecl(Context);
   }
 
   llvm_unreachable("Unhandled __builtin_va_list type kind");

@@ -282,6 +282,14 @@ createTargetCodeGenInfo(CodeGenModule &CGM) {
     return createHexagonTargetCodeGenInfo(CGM);
   case llvm::Triple::lanai:
     return createLanaiTargetCodeGenInfo(CGM);
+  case llvm::Triple::sh:
+  case llvm::Triple::sh2:
+  case llvm::Triple::sh2a:
+  case llvm::Triple::sh3:
+  case llvm::Triple::sh3e:
+  case llvm::Triple::sh4:
+  case llvm::Triple::sh4a:
+    return createSHTargetCodeGenInfo(CGM);
   case llvm::Triple::r600:
     return createAMDGPUTargetCodeGenInfo(CGM);
   case llvm::Triple::amdgcn:

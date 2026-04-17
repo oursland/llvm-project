@@ -171,6 +171,14 @@ std::string Linux::getMultiarchTriple(const Driver &D,
     return "sparc-linux-gnu";
   case llvm::Triple::sparcv9:
     return "sparc64-linux-gnu";
+  case llvm::Triple::sh:
+  case llvm::Triple::sh2:
+  case llvm::Triple::sh2a:
+  case llvm::Triple::sh3:
+  case llvm::Triple::sh3e:
+  case llvm::Triple::sh4:
+  case llvm::Triple::sh4a:
+    return "sh-linux-gnu";
   case llvm::Triple::systemz:
     return "s390x-linux-gnu";
   }
@@ -617,6 +625,16 @@ std::string Linux::getDynamicLinker(const ArgList &Args) const {
   default:
     llvm_unreachable("unsupported architecture");
 
+  case llvm::Triple::sh:
+  case llvm::Triple::sh2:
+  case llvm::Triple::sh2a:
+  case llvm::Triple::sh3:
+  case llvm::Triple::sh3e:
+  case llvm::Triple::sh4:
+  case llvm::Triple::sh4a:
+    LibDir = "lib";
+    Loader = "ld-linux.so.2";
+    break;
   case llvm::Triple::aarch64:
     LibDir = "lib";
     Loader = "ld-linux-aarch64.so.1";

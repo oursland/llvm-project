@@ -377,7 +377,16 @@ public:
     //    int* __va_reg;
     //    int __va_ndx;
     //} va_list;
-    XtensaABIBuiltinVaList
+    XtensaABIBuiltinVaList,
+
+    // typedef struct __va_list_tag {
+    //    void *__va_next_o;
+    //    void *__va_next_o_limit;
+    //    void *__va_next_fp;
+    //    void *__va_next_fp_limit;
+    //    void *__va_next_stack;
+    //} va_list;
+    SHBuiltinVaList
   };
 
 protected:

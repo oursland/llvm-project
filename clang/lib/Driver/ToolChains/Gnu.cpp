@@ -517,7 +517,10 @@ void tools::gnutools::Linker::ConstructJob(Compilation &C, const JobAction &JA,
       // LLVM support for atomics on 32-bit SPARC V8+ is incomplete, so
       // forcibly link with libatomic as a workaround.
       // TODO: Issue #41880 and D118021.
-      if (getToolChain().getTriple().getArch() == llvm::Triple::sparc) {
+      // SH has no hardware atomic instructions and lowers all atomics
+      // to __atomic_* libcalls provided by libatomic.
+      llvm::Triple::ArchType GnuArch = getToolChain().getTriple().getArch();
+      if (GnuArch == llvm::Triple::sparc || getToolChain().getTriple().isSH()) {
         CmdArgs.push_back("--push-state");
         CmdArgs.push_back("--as-needed");
         CmdArgs.push_back("-latomic");
@@ -2450,6 +2453,10 @@ void Generic_GCC::GCCInstallationDetector::AddDefaultGCCPrefixes(
                                                  "riscv64be-linux-gnu",
                                                  "riscv64be-unknown-elf"};
 
+  static const char *const SHLibDirs[] = {"/lib"};
+  static const char *const SHTriples[] = {"sh-linux-gnu",
+                                          "sh-unknown-linux-gnu"};
+
   static const char *const SPARCv8LibDirs[] = {"/lib32", "/lib"};
   static const char *const SPARCv8Triples[] = {"sparc-linux-gnu",
                                                "sparcv8-linux-gnu"};
@@ -2756,6 +2763,16 @@ void Generic_GCC::GCCInstallationDetector::AddDefaultGCCPrefixes(
     TripleAliases.append(begin(RISCV64beTriples), end(RISCV64beTriples));
     BiarchLibDirs.append(begin(RISCV32beLibDirs), end(RISCV32beLibDirs));
     BiarchTripleAliases.append(begin(RISCV32beTriples), end(RISCV32beTriples));
+    break;
+  case llvm::Triple::sh:
+  case llvm::Triple::sh2:
+  case llvm::Triple::sh2a:
+  case llvm::Triple::sh3:
+  case llvm::Triple::sh3e:
+  case llvm::Triple::sh4:
+  case llvm::Triple::sh4a:
+    LibDirs.append(begin(SHLibDirs), end(SHLibDirs));
+    TripleAliases.append(begin(SHTriples), end(SHTriples));
     break;
   case llvm::Triple::sparc:
   case llvm::Triple::sparcel:

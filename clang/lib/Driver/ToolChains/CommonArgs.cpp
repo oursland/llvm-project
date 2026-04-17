@@ -101,6 +101,13 @@ static bool useFramePointerForTargetByDefault(const llvm::opt::ArgList &Args,
   case llvm::Triple::loongarch32:
   case llvm::Triple::loongarch64:
   case llvm::Triple::m68k:
+  case llvm::Triple::sh:
+  case llvm::Triple::sh2:
+  case llvm::Triple::sh2a:
+  case llvm::Triple::sh3:
+  case llvm::Triple::sh3e:
+  case llvm::Triple::sh4:
+  case llvm::Triple::sh4a:
     return !clang::driver::tools::areOptimizationsEnabled(Args);
   default:
     break;
@@ -645,6 +652,16 @@ const char *tools::getLDMOption(const llvm::Triple &T, const ArgList &Args) {
     return "elf64ve";
   case llvm::Triple::csky:
     return "cskyelf_linux";
+  case llvm::Triple::sh:
+  case llvm::Triple::sh2:
+  case llvm::Triple::sh2a:
+  case llvm::Triple::sh3:
+  case llvm::Triple::sh3e:
+  case llvm::Triple::sh4:
+  case llvm::Triple::sh4a:
+    if (T.isOSLinux())
+      return "shlelf_linux";
+    return "elf32sh";
   default:
     return nullptr;
   }
@@ -836,6 +853,34 @@ std::string tools::getCPUName(const Driver &D, const ArgList &Args,
     if (const Arg *A = Args.getLastArg(options::OPT_mcpu_EQ))
       return A->getValue();
     return "";
+
+  case llvm::Triple::sh:
+  case llvm::Triple::sh2:
+  case llvm::Triple::sh2a:
+  case llvm::Triple::sh3:
+  case llvm::Triple::sh3e:
+  case llvm::Triple::sh4:
+  case llvm::Triple::sh4a:
+    if (const Arg *A = Args.getLastArg(options::OPT_mcpu_EQ))
+      return A->getValue();
+    // Default CPU based on triple arch. Bare `sh-*` is SH-1 (GCC's -m1).
+    switch (T.getArch()) {
+    case llvm::Triple::sh2:
+      return "sh2";
+    case llvm::Triple::sh2a:
+      return "sh2a";
+    case llvm::Triple::sh3:
+      return "sh3";
+    case llvm::Triple::sh3e:
+      return "sh3e";
+    case llvm::Triple::sh4:
+      return "sh4";
+    case llvm::Triple::sh4a:
+      return "sh4a";
+    case llvm::Triple::sh:
+    default:
+      return "sh1";
+    }
   }
 }
 

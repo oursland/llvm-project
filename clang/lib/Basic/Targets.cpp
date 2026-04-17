@@ -31,6 +31,7 @@
 #include "Targets/OSTargets.h"
 #include "Targets/PPC.h"
 #include "Targets/RISCV.h"
+#include "Targets/SH.h"
 #include "Targets/SPIR.h"
 #include "Targets/Sparc.h"
 #include "Targets/SystemZ.h"
@@ -544,6 +545,20 @@ std::unique_ptr<TargetInfo> AllocateTarget(const llvm::Triple &Triple,
       return std::make_unique<ZOSTargetInfo<SystemZTargetInfo>>(Triple, Opts);
     default:
       return std::make_unique<SystemZTargetInfo>(Triple, Opts);
+    }
+
+  case llvm::Triple::sh:
+  case llvm::Triple::sh2:
+  case llvm::Triple::sh2a:
+  case llvm::Triple::sh3:
+  case llvm::Triple::sh3e:
+  case llvm::Triple::sh4:
+  case llvm::Triple::sh4a:
+    switch (os) {
+    case llvm::Triple::Linux:
+      return std::make_unique<LinuxTargetInfo<SHTargetInfo>>(Triple, Opts);
+    default:
+      return std::make_unique<SHTargetInfo>(Triple, Opts);
     }
 
   case llvm::Triple::tce:
