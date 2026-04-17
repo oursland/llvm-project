@@ -16,6 +16,7 @@ add_public_tablegen_target(SHCommonTableGen)
 
 add_llvm_target(SHCodeGen
   SHAsmPrinter.cpp
+  SHConstantPoolValue.cpp
   SHFrameLowering.cpp
   SHInstrInfo.cpp
   SHISelDAGToDAG.cpp
